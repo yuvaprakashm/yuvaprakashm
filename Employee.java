@@ -1,33 +1,33 @@
-package net.texala.main;
+package net.texala.csv_file.employee;
 
-class Employee {
-    private int empID;
-    private String firstName;
-    private String lastName;
-    private String department;
+public class Employee {
+	private int empID;
+	private String firstName;
+	private String lastName;
+	private String department;
 
-    // Constructor
-    public Employee(int empID, String firstName, String lastName, String department) {
-        this.empID = empID;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.department = department;
-    }
+	public Employee(int empID, String firstName, String lastName, String department) {
+		this.empID = empID;
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.department = department;
 
-    // Getters
-    public int getEmpID() {
-        return empID;
-    }
+	}
 
-    public String getFirstName() {
-        return firstName;
-    }
+	public int getEmpID() {
+		return empID;
+	}
 
-    public String getLastName() {
-        return lastName;
-    }
+	public String getFirstName() {
+		return firstName;
+	}
 
-    public String getDepartment() {
-        return department;
-    }
+	public String getLastName() {
+		return lastName;
+	}
+
+	public String getDepartment() {
+		return department;
+	}
+
 }

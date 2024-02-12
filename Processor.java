@@ -1,4 +1,4 @@
-package net.texala.employee_service_sortanddisplay;
+package net.texala.main;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -7,8 +7,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Comparator;
 import java.util.Vector;
-
-import net.texala.employee_processor.Employee;
 
 public class Processor {
 	private Vector<Employee> employees;
@@ -23,10 +21,34 @@ public class Processor {
 		}
 	}
 
+	// Check validity of a record
+	private boolean isValidRecord(String line) {
+		String[] parts = line.split(",");
+		// Check if the line has correct number of fields
+		if (parts.length != 4) {
+			return false;
+		}
+		// Check validity of each field (you can add more checks as needed)
+		try {
+			int empID = Integer.parseInt(parts[0]);
+			String firstName = parts[1];
+			String lastName = parts[2];
+			String department = parts[3];
+			if (empID <= 0 || !firstName.matches("[a-zA-Z]+") || !lastName.matches("[a-zA-Z]+")) {
+				return false;
+			}
+		} catch (NumberFormatException e) {
+			return false;
+		}
+		return true;
+	}
+
+	// Read CSV file, extract valid records, and store in employees vector
+	// Read CSV file, extract valid records, and store in employees vector
 	public void readCSV(String fileName) {
 		try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
 			String line;
-			br.readLine();
+			br.readLine(); // Skip header
 
 			while ((line = br.readLine()) != null) {
 				if (isValidRecord(line)) {
@@ -51,12 +73,12 @@ public class Processor {
 					}
 
 					if (!isValidName(firstName)) {
-						errorWriter.write("Error! Invalid first name: " + firstName + "\n");
+						errorWriter.write("Error! Incorrect first name in record: " + line + "\n");
 						continue;
 					}
 
 					if (!isValidName(lastName)) {
-						errorWriter.write("Error! Invalid last name: " + lastName + "\n");
+						errorWriter.write("Error! Incorrect last name in record: " + line + "\n");
 						continue;
 					}
 
@@ -70,45 +92,41 @@ public class Processor {
 		}
 	}
 
-	private boolean isValidEmpID(int empID) {
+	public boolean isValidName(String name) {
+		boolean isValid = name.matches("[a-zA-Z]+");
+		if (!isValid) {
+			System.out.println("Invalid name: " + name);
+		}
+		return isValid;
+	}
 
+	private boolean isValidEmpID(int empID) {
 		return empID > 0;
 	}
 
-	private boolean isValidName(String name) {
-
-		return name.matches("[a-zA-Z]+");
-	}
-
-	private boolean isValidRecord(String line) {
-		String[] parts = line.split(",");
-		if (parts.length != 4) {
-			return false;
-		}
-
-		return true;
-	}
-
+	// Sort and display records
 	public void sortAndDisplay(String sortBy) {
-		Comparator<Employee> comparator = new EmployeeComparator(sortBy);
+	    Comparator<Employee> comparator = new EmployeeComparator(sortBy.toLowerCase());
 
-		switch (sortBy) {
-		case "FirstName":
-		case "LastName":
-		case "EmpID":
-			employees.sort(comparator);
-			break;
-		default:
-			System.out.println("Invalid sorting criteria.");
-			return;
-		}
-
-		System.out.println("Sorted Records:");
-		for (Employee employee : employees) {
-			System.out.println(employee);
-		}
+	    switch (sortBy.toLowerCase()) {
+	        case "firstname":
+	        case "lastname":
+	        case "empid":
+	        case "department":
+	            employees.sort(comparator);
+	            System.out.println("Sorted Records:");
+	            for (Employee employee : employees) {
+	                System.out.println(employee.getEmpID() + ", " + employee.getFirstName() + " " + employee.getLastName()
+	                        + ", " + employee.getDepartment());
+	            }
+	            break;
+	        default:
+	            System.out.println("Invalid sorting criteria.");
+	            break;
+	    }
 	}
 
+	// Save sorted file
 	public void saveSortedFile(String fileName) {
 		try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
 			writer.write("EMPID,First Name,Last Name,Department\n");
@@ -121,6 +139,7 @@ public class Processor {
 		}
 	}
 
+	// Close error writer
 	public void closeErrorWriter() {
 		try {
 			errorWriter.close();

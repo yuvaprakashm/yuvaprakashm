@@ -1,4 +1,4 @@
-package net.texala.employee_service.cs_writer;
+package net.texala.main;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -6,8 +6,6 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Scanner;
 import java.util.Set;
-
-import net.texala.employee_service_sortanddisplay.Processor;
 
 public class CsWriter {
     private static final String FILE_NAME = "record.csv";

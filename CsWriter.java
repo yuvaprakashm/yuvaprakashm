@@ -7,6 +7,8 @@ import java.util.HashSet;
 import java.util.Scanner;
 import java.util.Set;
 
+import net.texala.employee_service_sortanddisplay.Processor;
+
 public class CsWriter {
     private static final String FILE_NAME = "record.csv";
     private static final String HEADER = "EMPID,First Name,Last Name,Department\n";
@@ -35,7 +37,7 @@ public class CsWriter {
                 System.out.print("Enter your choice: ");
 
                 int departmentChoice = scanner.nextInt();
-                scanner.nextLine(); // Consume newline
+                scanner.nextLine();
 
                 if (departmentChoice == 5) {
                     System.out.println("Exiting the program...");
@@ -70,7 +72,7 @@ public class CsWriter {
                 System.out.print("Enter your choice: ");
 
                 int choice = scanner.nextInt();
-                scanner.nextLine(); 
+                scanner.nextLine();
 
                 switch (choice) {
                     case 1:
@@ -99,340 +101,306 @@ public class CsWriter {
     }
 
     public static void registerEmployee(FileWriter writer, String department) throws IOException {
-    	System.out.println("Enter EMPID :");
-		String empId = validateNumericInput(scanner.nextLine());
+        System.out.println("Enter EMPID :");
+        String empId = scanner.nextLine();
 
-		if (isEmpIdExists(empId)) {
-			System.out.println("EMPID " + empId + " is already registered. Please enter a unique EMPID.");
-			return;
-		}
+        if (isEmpIdExists(empId)) {
+            System.out.println("EMPID " + empId + " is already registered. Please enter a unique EMPID.");
+            return;
+        }
 
-		if (!isValidEmpID(empId)) {
-			System.out.println("Invalid EMPID format. Please enter a valid numeric EMPID.");
-			return;
-		}
+        System.out.println("Enter First Name:");
+        String firstName = scanner.nextLine();
 
-		System.out.println("Enter First Name:");
-		String firstName = validateStringInput(scanner.nextLine());
-		if (!isValidName(firstName)) {
-			System.out.println("Invalid first name format. Please enter a valid name.");
-			return;
-		}
+        System.out.println("Enter Last Name:");
+        String lastName = scanner.nextLine();
 
-		System.out.println("Enter Last Name:");
-		String lastName = validateStringInput(scanner.nextLine());
-		if (!isValidName(lastName)) {
-			System.out.println("Invalid last name format. Please enter a valid name.");
-			return;
-		}
+        String record = empId + ',' + firstName + ',' + lastName + ',' + department + "\n";
+        writer.write(record);
+        writer.flush();
+        System.out.println("Employee registered successfully.");
 
-		String record = empId + ',' + firstName + ',' + lastName + ',' + department + "\n";
-		writer.write(record);
-		writer.flush();
-		System.out.println("Employee registered successfully.");
+        registeredEmpId.add(empId);
 
-		registeredEmpId.add(empId);
+        Processor processor = new Processor();
+        processor.readCSV(FILE_NAME);
     }
 
     public static void updateEmployee(FileWriter writer) throws IOException {
-    	File originalFile = new File(FILE_NAME);
-		Scanner fileScanner = new Scanner(originalFile);
+        System.out.println("Enter EMPID of the employee to update:");
+        String empIdToUpdate = scanner.nextLine();
 
-		StringBuilder updatedData = new StringBuilder();
-		boolean found = false;
+        File originalFile = new File(FILE_NAME);
+        Scanner fileScanner = new Scanner(originalFile);
 
-		System.out.println("Enter EMPID of the employee to update:");
-		String empIdToUpdate = scanner.nextLine();
+        StringBuilder updatedData = new StringBuilder();
+        boolean found = false;
 
-		while (fileScanner.hasNextLine()) {
-			String line = fileScanner.nextLine();
-			String[] parts = line.split(",");
+        while (fileScanner.hasNextLine()) {
+            String line = fileScanner.nextLine();
+            String[] parts = line.split(",");
 
-			if (parts[0].equals(empIdToUpdate)) {
-				System.out.println("Choose what to update:");
-				System.out.println("1. Update First Name");
-				System.out.println("2. Update Last Name");
-				System.out.println("3. Update Department");
-				System.out.println("4. Update All Details");
-				System.out.print("Enter your choice: ");
-				int updateChoice = scanner.nextInt();
-				scanner.nextLine();
+            if (parts[0].equals(empIdToUpdate)) {
+                System.out.println("Choose what to update:");
+                System.out.println("1. Update First Name");
+                System.out.println("2. Update Last Name");
+                System.out.println("3. Update Department");
+                System.out.println("4. Update All Details");
+                System.out.print("Enter your choice: ");
+                int updateChoice = scanner.nextInt();
+                scanner.nextLine();
 
-				switch (updateChoice) {
-				case 1:
-					System.out.println("Enter new First Name:");
-					String newFirstName = validateStringInput(scanner.nextLine());
-					parts[1] = newFirstName;
-					break;
-				case 2:
-					System.out.println("Enter new Last Name:");
-					String newLastName = validateStringInput(scanner.nextLine());
-					parts[2] = newLastName;
-					break;
-				case 3:
-					System.out.println("Choose new Department:");
-					System.out.println("1. PS");
-					System.out.println("2. DEV");
-					System.out.println("3. QA");
-					System.out.println("4. ADMIN");
-					System.out.print("Choose department: ");
-					int newDepartmentChoice = scanner.nextInt();
-					scanner.nextLine();
-					String newDepartment;
-					switch (newDepartmentChoice) {
-					case 1:
-						newDepartment = "PS";
-						break;
-					case 2:
-						newDepartment = "DEV";
-						break;
-					case 3:
-						newDepartment = "QA";
-						break;
-					case 4:
-						newDepartment = "ADMIN";
-						break;
-					default:
-						System.out.println("Invalid department choice.");
-						return;
-					}
-					parts[3] = newDepartment;
-					break;
-				case 4:
-					System.out.println("Enter new First Name:");
-					newFirstName = validateStringInput(scanner.nextLine());
-					System.out.println("Enter new Last Name:");
-					newLastName = validateStringInput(scanner.nextLine());
-					System.out.println("Choose new Department:");
-					System.out.println("1. PS");
-					System.out.println("2. DEV");
-					System.out.println("3. QA");
-					System.out.println("4. ADMIN");
-					System.out.print("Choose department: ");
-					newDepartmentChoice = scanner.nextInt();
-					scanner.nextLine();
-					switch (newDepartmentChoice) {
-					case 1:
-						newDepartment = "PS";
-						break;
-					case 2:
-						newDepartment = "DEV";
-						break;
-					case 3:
-						newDepartment = "QA";
-						break;
-					case 4:
-						newDepartment = "ADMIN";
-						break;
-					default:
-						System.out.println("Invalid department choice.");
-						return;
-					}
-					parts[1] = newFirstName;
-					parts[2] = newLastName;
-					parts[3] = newDepartment;
-					break;
-				default:
-					System.out.println("Invalid choice.");
-					return;
-				}
+                switch (updateChoice) {
+                    case 1:
+                        System.out.println("Enter new First Name:");
+                        String newFirstName = scanner.nextLine();
+                        parts[1] = newFirstName;
+                        break;
+                    case 2:
+                        System.out.println("Enter new Last Name:");
+                        String newLastName = scanner.nextLine();
+                        parts[2] = newLastName;
+                        break;
+                    case 3:
+                        System.out.println("Choose new Department:");
+                        System.out.println("1. PS");
+                        System.out.println("2. DEV");
+                        System.out.println("3. QA");
+                        System.out.println("4. ADMIN");
+                        System.out.print("Choose department: ");
+                        int newDepartmentChoice = scanner.nextInt();
+                        scanner.nextLine();
+                        String newDepartment;
+                        switch (newDepartmentChoice) {
+                            case 1:
+                                newDepartment = "PS";
+                                break;
+                            case 2:
+                                newDepartment = "DEV";
+                                break;
+                            case 3:
+                                newDepartment = "QA";
+                                break;
+                            case 4:
+                                newDepartment = "ADMIN";
+                                break;
+                            default:
+                                System.out.println("Invalid department choice.");
+                                return;
+                        }
+                        parts[3] = newDepartment;
+                        break;
+                    case 4:
+                        System.out.println("Enter new First Name:");
+                        newFirstName = scanner.nextLine();
+                        System.out.println("Enter new Last Name:");
+                        newLastName = scanner.nextLine();
+                        System.out.println("Choose new Department:");
+                        System.out.println("1. PS");
+                        System.out.println("2. DEV");
+                        System.out.println("3. QA");
+                        System.out.println("4. ADMIN");
+                        System.out.print("Choose department: ");
+                        newDepartmentChoice = scanner.nextInt();
+                        scanner.nextLine();
+                        switch (newDepartmentChoice) {
+                            case 1:
+                                newDepartment = "PS";
+                                break;
+                            case 2:
+                                newDepartment = "DEV";
+                                break;
+                            case 3:
+                                newDepartment = "QA";
+                                break;
+                            case 4:
+                                newDepartment = "ADMIN";
+                                break;
+                            default:
+                                System.out.println("Invalid department choice.");
+                                return;
+                        }
+                        parts[1] = newFirstName;
+                        parts[2] = newLastName;
+                        parts[3] = newDepartment;
+                        break;
+                    default:
+                        System.out.println("Invalid choice.");
+                        return;
+                }
 
-				found = true;
-			}
+                found = true;
+            }
 
-			updatedData.append(String.join(",", parts)).append("\n");
-		}
+            updatedData.append(String.join(",", parts)).append("\n");
+        }
 
-		fileScanner.close();
+        fileScanner.close();
 
-		if (!found) {
-			System.out.println("Employee not found in the selected department.");
-		} else {
-			FileWriter fileWriter = new FileWriter(FILE_NAME);
-			fileWriter.write(updatedData.toString());
-			fileWriter.close();
-			System.out.println("Employee details updated successfully.");
-		}
+        if (!found) {
+            System.out.println("Employee not found in the selected department.");
+        } else {
+            FileWriter fileWriter = new FileWriter(FILE_NAME);
+            fileWriter.write(updatedData.toString());
+            fileWriter.close();
+            System.out.println("Employee details updated successfully.");
+        }
     }
 
     public static void deleteEmployee(FileWriter writer) throws IOException {
-    	System.out.println("Enter EMPID of the employee to delete:");
-		String empIdToDelete = scanner.nextLine();
+        System.out.println("Enter EMPID of the employee to delete:");
+        String empIdToDelete = scanner.nextLine();
 
-		File originalFile = new File(FILE_NAME);
-		Scanner fileScanner = new Scanner(originalFile);
+        File originalFile = new File(FILE_NAME);
+        Scanner fileScanner = new Scanner(originalFile);
 
-		StringBuilder updatedData = new StringBuilder();
-		boolean found = false;
+        StringBuilder updatedData = new StringBuilder();
+        boolean found = false;
 
-		while (fileScanner.hasNextLine()) {
-			String line = fileScanner.nextLine();
-			String[] parts = line.split(",");
+        while (fileScanner.hasNextLine()) {
+            String line = fileScanner.nextLine();
+            String[] parts = line.split(",");
 
-			if (parts[0].equals(empIdToDelete)) {
-				found = true;
-				System.out.println("Employee deleted successfully.");
-			} else {
-				updatedData.append(line).append("\n");
-			}
-		}
+            if (parts[0].equals(empIdToDelete)) {
+                found = true;
+                System.out.println("Employee deleted successfully.");
+            } else {
+                updatedData.append(line).append("\n");
+            }
+        }
 
-		fileScanner.close();
+        fileScanner.close();
 
-		if (!found) {
-			System.out.println("Employee not found.");
-		} else {
-			FileWriter fileWriter = new FileWriter(FILE_NAME);
-			fileWriter.write(updatedData.toString());
-			fileWriter.close();
-		}
-	}
-    
+        if (!found) {
+            System.out.println("Employee not found.");
+        } else {
+            FileWriter fileWriter = new FileWriter(FILE_NAME);
+            fileWriter.write(updatedData.toString());
+            fileWriter.close();
+        }
+    }
 
     public static void displayEmployee() throws IOException {
-    	System.out.println("Choose how to display employee details:");
-		System.out.println("1. Display by EMPID");
-		System.out.println("2. Display all employees");
-		System.out.println("3. Display by Department");
-		System.out.print("Enter your choice: ");
+        System.out.println("Choose how to display employee details:");
+        System.out.println("1. Display by EMPID");
+        System.out.println("2. Display all employees");
+        System.out.println("3. Display by Department");
+        System.out.print("Enter your choice: ");
 
-		int choice = scanner.nextInt();
-		scanner.nextLine();
+        int choice = scanner.nextInt();
+        scanner.nextLine();
 
-		switch (choice) {
-		case 1:
-			displayEmployeeById(scanner);
-			break;
-		case 2:
-			displayAllEmployees();
-			break;
-		case 3:
-			displayEmployeeByDepartment(scanner);
-			break;
-		default:
-			System.out.println("Invalid choice. Please select a number between 1 and 3.");
-			break;
-		}
-	}
+        switch (choice) {
+            case 1:
+                displayEmployeeById(scanner);
+                break;
+            case 2:
+                displayAllEmployees();
+                break;
+            case 3:
+                displayEmployeeByDepartment(scanner);
+                break;
+            default:
+                System.out.println("Invalid choice. Please select a number between 1 and 3.");
+                break;
+        }
+    }
 
-	private static void displayEmployeeById(Scanner scanner) throws IOException {
-		System.out.println("Enter EMPID to display employee details:");
-		String empId = scanner.nextLine();
+    private static void displayEmployeeById(Scanner scanner) throws IOException {
+        System.out.println("Enter EMPID to display employee details:");
+        String empId = scanner.nextLine();
 
-		Scanner fileScanner = new Scanner(new File(FILE_NAME));
-		boolean found = false;
-		System.out.println("EMPID,First Name,Last Name,Department");
-		while (fileScanner.hasNextLine()) {
-			String line = fileScanner.nextLine();
-			String[] parts = line.split(",");
-			if (parts.length > 0 && parts[0].equals(empId)) {
-				System.out.println(line);
-				found = true;
-				break;
-			}
-		}
+        Scanner fileScanner = new Scanner(new File(FILE_NAME));
+        boolean found = false;
+        System.out.println("EMPID,First Name,Last Name,Department");
+        while (fileScanner.hasNextLine()) {
+            String line = fileScanner.nextLine();
+            String[] parts = line.split(",");
+            if (parts.length > 0 && parts[0].equals(empId)) {
+                System.out.println(line);
+                found = true;
+                break;
+            }
+        }
 
-		fileScanner.close();
+        fileScanner.close();
 
-		if (!found) {
-			System.out.println("Employee with EMPID " + empId + " not found.");
-		}
-	}
+        if (!found) {
+            System.out.println("Employee with EMPID " + empId + " not found.");
+        }
+    }
 
-	private static void displayAllEmployees() throws IOException {
-		Scanner fileScanner = new Scanner(new File(FILE_NAME));
-		while (fileScanner.hasNextLine()) {
-			System.out.println(fileScanner.nextLine());
-		}
+    private static void displayAllEmployees() throws IOException {
+        Scanner fileScanner = new Scanner(new File(FILE_NAME));
+        while (fileScanner.hasNextLine()) {
+            System.out.println(fileScanner.nextLine());
+        }
 
-		fileScanner.close();
-	}
+        fileScanner.close();
+    }
 
-	private static void displayEmployeeByDepartment(Scanner scanner) throws IOException {
-		System.out.println("Choose Department:");
-		System.out.println("1. PS");
-		System.out.println("2. DEV");
-		System.out.println("3. QA");
-		System.out.println("4. ADMIN");
-		System.out.print("Select option : ");
+    private static void displayEmployeeByDepartment(Scanner scanner) throws IOException {
+        System.out.println("Choose Department:");
+        System.out.println("1. PS");
+        System.out.println("2. DEV");
+        System.out.println("3. QA");
+        System.out.println("4. ADMIN");
+        System.out.print("Select option : ");
 
-		int departmentChoice = scanner.nextInt();
-		scanner.nextLine();
+        int departmentChoice = scanner.nextInt();
+        scanner.nextLine();
 
-		String department;
-		switch (departmentChoice) {
-		case 1:
-			department = "PS";
-			break;
-		case 2:
-			department = "DEV";
-			break;
-		case 3:
-			department = "QA";
-			break;
-		case 4:
-			department = "ADMIN";
-			break;
-		default:
-			System.out.println("Invalid department choice.");
-			return;
-		}
+        String department;
+        switch (departmentChoice) {
+            case 1:
+                department = "PS";
+                break;
+            case 2:
+                department = "DEV";
+                break;
+            case 3:
+                department = "QA";
+                break;
+            case 4:
+                department = "ADMIN";
+                break;
+            default:
+                System.out.println("Invalid department choice.");
+                return;
+        }
 
-		Scanner fileScanner = new Scanner(new File(FILE_NAME));
-		boolean found = false;
+        Scanner fileScanner = new Scanner(new File(FILE_NAME));
+        boolean found = false;
 
-		System.out.println("Employees in department " + department + ":");
-		System.out.println("EMPID,First Name,Last Name,Department");
-		while (fileScanner.hasNextLine()) {
-			String line = fileScanner.nextLine();
-			String[] parts = line.split(",");
-			if (parts.length > 3 && parts[3].equals(department)) {
-				System.out.println(line);
-				found = true;
-			}
-		}
+        System.out.println("Employees in department " + department + ":");
+        System.out.println("EMPID,First Name,Last Name,Department");
+        while (fileScanner.hasNextLine()) {
+            String line = fileScanner.nextLine();
+            String[] parts = line.split(",");
+            if (parts.length > 3 && parts[3].equals(department)) {
+                System.out.println(line);
+                found = true;
+            }
+        }
 
-		fileScanner.close();
+        fileScanner.close();
 
-		if (!found) {
-			System.out.println("No employees found in department: " + department);
-		}
-	}
-	private static String validateNumericInput(String input) {
-		while (!input.matches("\\d+")) {
-			System.out.println("Invalid input. Please enter numeric characters only:");
-			input = scanner.nextLine();
-		}
-		return input;
-	}
+        if (!found) {
+            System.out.println("No employees found in department: " + department);
+        }
+    }
 
-	private static String validateStringInput(String input) {
-		while (!input.matches("[a-zA-Z]+")) {
-			System.out.println("Invalid input. Please enter alphabetic characters only:");
-			input = scanner.nextLine();
-		}
-		return input;
-	}
-
-	private static boolean isEmpIdExists(String empId) throws IOException {
-		Scanner fileScanner = new Scanner(new File(FILE_NAME));
-		while (fileScanner.hasNextLine()) {
-			String line = fileScanner.nextLine();
-			String[] parts = line.split(",");
-			if (parts.length > 0 && parts[0].equals(empId)) {
-				fileScanner.close();
-				return true;
-			}
-		}
-		fileScanner.close();
-		return false;
-	}
-
-	private static boolean isValidEmpID(String empId) {
-		return empId.matches("\\d{1,10}");
-	}
-
-	private static boolean isValidName(String name) {
-		return name.matches("[a-zA-Z]+");
-	}
+    private static boolean isEmpIdExists(String empId) throws IOException {
+        Scanner fileScanner = new Scanner(new File(FILE_NAME));
+        while (fileScanner.hasNextLine()) {
+            String line = fileScanner.nextLine();
+            String[] parts = line.split(",");
+            if (parts.length > 0 && parts[0].equals(empId)) {
+                fileScanner.close();
+                return true;
+            }
+        }
+        fileScanner.close();
+        return false;
+    }
 }

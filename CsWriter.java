@@ -121,9 +121,6 @@ public class CsWriter {
         System.out.println("Employee registered successfully.");
 
         registeredEmpId.add(empId);
-
-        Processor processor = new Processor();
-        processor.readCSV(FILE_NAME);
     }
 
     public static void updateEmployee(FileWriter writer) throws IOException {

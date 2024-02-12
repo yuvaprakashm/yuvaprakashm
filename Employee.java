@@ -1,4 +1,4 @@
-package net.texala.csv_file.employee;
+package net.texala.main;
 
 public class Employee {
 	private int empID;

@@ -31,7 +31,8 @@ public class Employee {
 
     @Override
     public String toString() {
-        return "Employee ID: " + empId + ", FirstName: " + firstName + ", LastName: " + lastName + ", Department: " + department;
+    	System.out.println("EmpID, FirstName, LastName, Department");
+        return  + empId  + firstName   + lastName  + department;
     }
 
     public void setFirstName(String newValue) {

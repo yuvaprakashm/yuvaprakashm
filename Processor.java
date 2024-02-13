@@ -9,142 +9,126 @@ import java.util.Comparator;
 import java.util.Vector;
 
 public class Processor {
-	private Vector<Employee> employees;
-	private BufferedWriter errorWriter;
+    private Vector<Employee> employees;
+    private BufferedWriter errorWriter;
 
-	public Processor() {
-		employees = new Vector<>();
-		try {
-			errorWriter = new BufferedWriter(new FileWriter("error.log"));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
+    public Processor() {
+        employees = new Vector<>();
+        try {
+            errorWriter = new BufferedWriter(new FileWriter("error.log"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
-	// Check validity of a record
-	private boolean isValidRecord(String line) {
-		String[] parts = line.split(",");
-		// Check if the line has correct number of fields
-		if (parts.length != 4) {
-			return false;
-		}
-		// Check validity of each field (you can add more checks as needed)
-		try {
-			int empID = Integer.parseInt(parts[0]);
-			String firstName = parts[1];
-			String lastName = parts[2];
-			String department = parts[3];
-			if (empID <= 0 || !firstName.matches("[a-zA-Z]+") || !lastName.matches("[a-zA-Z]+")) {
-				return false;
-			}
-		} catch (NumberFormatException e) {
-			return false;
-		}
-		return true;
-	}
+    private boolean isValidName(String name) {
+        return name.matches("[a-zA-Z]+");
+    }
 
-	// Read CSV file, extract valid records, and store in employees vector
-	// Read CSV file, extract valid records, and store in employees vector
-	public void readCSV(String fileName) {
-		try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
-			String line;
-			br.readLine(); // Skip header
+    private boolean isValidEmpID(int empID) {
+        return empID > 0;
+    }
 
-			while ((line = br.readLine()) != null) {
-				if (isValidRecord(line)) {
-					String[] parts = line.split(",");
-					int empID;
-					String firstName;
-					String lastName;
-					String department;
-					try {
-						empID = Integer.parseInt(parts[0]);
-						firstName = parts[1];
-						lastName = parts[2];
-						department = parts[3];
-					} catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
-						errorWriter.write("Error! Invalid record format: " + line + "\n");
-						continue;
-					}
+    private void logError(String error) {
+        try {
+            errorWriter.write(error + "\n");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
-					if (!isValidEmpID(empID)) {
-						errorWriter.write("Error! Invalid Employee ID: " + empID + "\n");
-						continue;
-					}
+    public void readCSV(String fileName) {
+        try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
+            String line;
+            br.readLine(); // Skip header
 
-					if (!isValidName(firstName)) {
-						errorWriter.write("Error! Incorrect first name in record: " + line + "\n");
-						continue;
-					}
+            while ((line = br.readLine()) != null) {
+                String[] parts = line.split(",");
 
-					if (!isValidName(lastName)) {
-						errorWriter.write("Error! Incorrect last name in record: " + line + "\n");
-						continue;
-					}
+                if (parts.length != 4) {
+                    logError("Error! Invalid record format: " + line);
+                    continue;
+                }
 
-					employees.add(new Employee(empID, firstName, lastName, department));
-				} else {
-					errorWriter.write("Error! Invalid record: " + line + "\n");
-				}
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
+                try {
+                    int empID = Integer.parseInt(parts[0]);
+                    String firstName = parts[1];
+                    String lastName = parts[2];
+                    String department = parts[3];
 
-	public boolean isValidName(String name) {
-		boolean isValid = name.matches("[a-zA-Z]+");
-		if (!isValid) {
-			System.out.println("Invalid name: " + name);
-		}
-		return isValid;
-	}
+                    if (!isValidEmpID(empID)) {
+                        logError("Error! Invalid Employee ID: " + empID);
+                        continue;
+                    }
 
-	private boolean isValidEmpID(int empID) {
-		return empID > 0;
-	}
+                    boolean validFirstName = isValidName(firstName);
+                    boolean validLastName = isValidName(lastName);
 
-	// Sort and display records
-	public void sortAndDisplay(String sortBy) {
-	    Comparator<Employee> comparator = new EmployeeComparator(sortBy.toLowerCase());
+                    if (!validFirstName && !validLastName) {
+                        logError("Error! Incorrect first name and last name in record: " + line);
+                        continue;
+                    }
 
-	    switch (sortBy.toLowerCase()) {
-	        case "firstname":
-	        case "lastname":
-	        case "empid":
-	        case "department":
-	            employees.sort(comparator);
-	            System.out.println("Sorted Records:");
-	            for (Employee employee : employees) {
-	                System.out.println(employee.getEmpID() + ", " + employee.getFirstName() + " " + employee.getLastName()
-	                        + ", " + employee.getDepartment());
-	            }
-	            break;
-	        default:
-	            System.out.println("Invalid sorting criteria.");
-	            break;
-	    }
-	}
+                    if (!validFirstName) {
+                        logError("Error! Incorrect first name in record: " + line);
+                        continue;
+                    }
 
-	// Save sorted file
-	public void saveSortedFile(String fileName) {
-		try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
-			writer.write("EMPID,First Name,Last Name,Department\n");
-			for (Employee employee : employees) {
-				writer.write(employee.getEmpID() + "," + employee.getFirstName() + "," + employee.getLastName() + ","
-						+ employee.getDepartment() + "\n");
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
+                    if (!validLastName) {
+                        logError("Error! Incorrect last name in record: " + line);
+                        continue;
+                    }
 
-	// Close error writer
-	public void closeErrorWriter() {
-		try {
-			errorWriter.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-}
+                    employees.add(new Employee(empID, firstName, lastName, department));
+                } catch (NumberFormatException e) {
+                    logError("Error! Invalid record format: " + line);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void closeErrorWriter() {
+        try {
+            errorWriter.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+ // Sort and display records
+  	public void sortAndDisplay(String sortBy) {
+  	    Comparator<Employee> comparator = new EmployeeComparator(sortBy.toLowerCase());
+
+  	    switch (sortBy.toLowerCase()) {
+  	        case "firstname":
+  	        case "lastname":
+  	        case "empid":
+  	        case "department":
+  	            employees.sort(comparator);
+  	            System.out.println("Sorted Records:");
+  	            for (Employee employee : employees) {
+  	                System.out.println(employee.getEmpID() + ", " + employee.getFirstName() + " " + employee.getLastName()
+  	                        + ", " + employee.getDepartment());
+  	            }
+  	            break;
+  	        default:
+  	            System.out.println("Invalid sorting criteria.");
+  	            break;
+  	    }
+  	}
+
+  	// Save sorted file
+  	public void saveSortedFile(String fileName) {
+  		try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
+  			writer.write("EMPID,First Name,Last Name,Department\n");
+  			for (Employee employee : employees) {
+  				writer.write(employee.getEmpID() + "," + employee.getFirstName() + "," + employee.getLastName() + ","
+  						+ employee.getDepartment() + "\n");
+  			}
+  		} catch (IOException e) {
+  			e.printStackTrace();
+  		}
+  	}
+ }

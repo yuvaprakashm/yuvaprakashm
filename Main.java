@@ -2,17 +2,17 @@ package net.texala.main;
 
 import java.util.Scanner;
 
+import net.texala.employee_processor.Processor;
+
 public class Main {
     public static void main(String[] args) {
-        Processor processor = new Processor();
+        Processor pro = new Processor();
         Scanner scanner = new Scanner(System.in);
 
-        processor.readCSV("record.csv");
+        pro.readCSV("record.csv");
 
-        boolean exit = false;
+        while (true) {
 
-        while (!exit) {
-            // Display menu
             System.out.println("Choose sorting criteria:");
             System.out.println("1. First Name");
             System.out.println("2. Last Name");
@@ -21,7 +21,6 @@ public class Main {
             System.out.println("5. Exit");
             System.out.print("Enter your choice: ");
 
-            // Read user choice
             int choice = scanner.nextInt();
             String sortBy = null;
 
@@ -39,24 +38,19 @@ public class Main {
                     sortBy = "department";
                     break;
                 case 5:
-                    exit = true;
-                    break;
+                    sortBy = "exit";
+                    System.out.println("Terminating the program");
+                    scanner.close(); 
+                    return;  
                 default:
                     System.out.println("Invalid choice. Please enter a valid option.");
                     continue;
             }
 
-            if (!exit) {
-                processor.sortAndDisplay(sortBy);
-
-                processor.saveSortedFile("sorted_output.csv");
-
-                processor.closeErrorWriter();
-            }
+            pro.sortAndDisplay(sortBy);
+            pro.saveSortedFile("sorted_output.csv");
+            pro.findDuplicatesAndLog();
+            pro.closeErrorWriter();
         }
-
-        System.out.println("Exiting...");
-
-        scanner.close();
     }
 }

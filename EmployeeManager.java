@@ -45,7 +45,7 @@ public class EmployeeManager {
 		System.out.println("Employee not found.");
 	}
 
-	public void deleteEmployee(int empId) {
+	public void deleteEmployeeById(int empId) {
 		for (int i = 0; i < employeeRecords.size(); i++) {
 			if (employeeRecords.get(i).getEmpId() == empId) {
 				employeeRecords.remove(i);
@@ -54,6 +54,25 @@ public class EmployeeManager {
 			}
 		}
 		System.out.println("Employee not found.");
+	}
+
+	public void deleteAllEmployees() {
+		employeeRecords.clear();
+		System.out.println("All employees deleted successfully.");
+	}
+
+	public void deleteEmployeesInRange(int startEmpId, int endEmpId) {
+		int count = 0;
+		for (int i = 0; i < employeeRecords.size(); i++) {
+			int empId = employeeRecords.get(i).getEmpId();
+			if (empId >= startEmpId && empId <= endEmpId) {
+				employeeRecords.remove(i);
+				count++;
+				// Decrement index as removing an element shifts others to the left
+				i--;
+			}
+		}
+		System.out.println(count + " employees deleted in the specified range.");
 	}
 
 	public void printEmployees() {
@@ -93,6 +112,7 @@ public class EmployeeManager {
 				break;
 			default:
 				System.out.println("Invalid parameter.");
+				break; // Add this break statement
 			}
 		}
 	}
@@ -120,12 +140,14 @@ public class EmployeeManager {
 		while (!exit) {
 			System.out.println("\n1. Add Employee");
 			System.out.println("2. Update Employee");
-			System.out.println("3. Delete Employee");
-			System.out.println("4. Print All Employees");
-			System.out.println("5. Print Employees in Range");
-			System.out.println("6. Print Employees by Parameter");
-			System.out.println("7. Commit Changes");
-			System.out.println("8. Exit");
+			System.out.println("3. Delete Employee by ID");
+			System.out.println("4. Delete All Employees");
+			System.out.println("5. Delete Employees in Range");
+			System.out.println("6. Print All Employees");
+			System.out.println("7. Print Employees in Range");
+			System.out.println("8. Print Employees by Parameter");
+			System.out.println("9. Commit Changes");
+			System.out.println("10. Exit");
 			System.out.print("\nEnter your choice: ");
 
 			int choice = scanner.nextInt();
@@ -141,15 +163,69 @@ public class EmployeeManager {
 				System.out.println("Enter Last Name:");
 				String lastName = scanner.nextLine();
 				System.out.println("Enter Department:");
-				String department = scanner.nextLine();
+
+				System.out.println("1. Dev");
+				System.out.println("2. Ps");
+				System.out.println("3. Qa");
+				System.out.println("4. Admin");
+				System.out.print("Select Department: ");
+
+				int departmentChoice = scanner.nextInt();
+
+				scanner.nextLine();
+				String department;
+
+				switch (departmentChoice) {
+				case 1:
+					department = "Dev";
+					break;
+				case 2:
+					department = "Ps";
+					break;
+				case 3:
+					department = "Qa";
+					break;
+				case 4:
+					department = "Admin";
+					break;
+				default:
+					System.out.println("Invalid department choice. Defaulting to 'Unknown'.");
+					department = "Unknown";
+					break;
+				}
+
 				manager.addEmployee(empId, firstName, lastName, department);
 				break;
 			case 2:
 				System.out.println("Enter EMPID of the employee to update:");
 				int empIdToUpdate = scanner.nextInt();
 				scanner.nextLine();
-				System.out.println("Choose field to update (First Name, Last Name, Department):");
-				String fieldToUpdate = scanner.nextLine();
+				System.out.println("Choose field to update:");
+				System.out.println("1. First Name");
+				System.out.println("2. Last Name");
+				System.out.println("3. Department");
+				System.out.print("Select Field: ");
+
+				int fieldChoice = scanner.nextInt();
+				scanner.nextLine(); // Consume newline
+
+				String fieldToUpdate;
+
+				switch (fieldChoice) {
+				case 1:
+					fieldToUpdate = "First Name";
+					break;
+				case 2:
+					fieldToUpdate = "Last Name";
+					break;
+				case 3:
+					fieldToUpdate = "Department";
+					break;
+				default:
+					System.out.println("Invalid field choice. Defaulting to 'Unknown'.");
+					fieldToUpdate = "Unknown";
+					break;
+				}
 				System.out.println("Enter new value:");
 				String newValue = scanner.nextLine();
 				manager.updateEmployee(empIdToUpdate, fieldToUpdate, newValue);
@@ -158,34 +234,77 @@ public class EmployeeManager {
 				System.out.println("Enter EMPID of the employee to delete:");
 				int empIdToDelete = scanner.nextInt();
 				scanner.nextLine();
-				manager.deleteEmployee(empIdToDelete);
+				manager.deleteEmployeeById(empIdToDelete);
 				break;
+
 			case 4:
-				manager.printEmployees();
+				manager.deleteAllEmployees();
 				break;
 			case 5:
+				System.out.println("Enter starting EMPID of the range:");
+				int startEmpId = scanner.nextInt();
+				System.out.println("Enter ending EMPID of the range:");
+				int endEmpId = scanner.nextInt();
+				scanner.nextLine(); // Consume newline
+				manager.deleteEmployeesInRange(startEmpId, endEmpId);
+				break;
+
+			case 6:
+				manager.printEmployees();
+				break;
+			case 7:
 				System.out.println("Enter start EMPID:");
 				int startId = scanner.nextInt();
 				System.out.println("Enter end EMPID:");
 				int endId = scanner.nextInt();
 				manager.printEmployees(startId, endId);
 				break;
-			case 6:
-				System.out.println("Choose parameter to search (First Name, Last Name, Department):");
-				String parameter = scanner.nextLine();
+
+			case 8:
+				System.out.println("Choose parameter to search:");
+				System.out.println("1. First Name");
+				System.out.println("2. Last Name");
+				System.out.println("3. Department");
+				System.out.print("Select Parameter: ");
+
+				int parameterChoice = scanner.nextInt();
+				scanner.nextLine(); // Consume newline
+
+				String parameter;
+
+				switch (parameterChoice) {
+				case 1:
+					parameter = "First Name";
+					break;
+				case 2:
+					parameter = "Last Name";
+					break;
+				case 3:
+					parameter = "Department";
+					break;
+				default:
+					System.out.println("Invalid parameter choice. Defaulting to 'Unknown'.");
+					parameter = "Unknown";
+					break;
+				}
+
 				System.out.println("Enter value to search:");
 				String value = scanner.nextLine();
 				manager.printEmployeeByParameter(parameter, value);
+
 				break;
-			case 7:
+			case 9:
 				manager.commitChanges();
 				break;
-			case 8:
+			case 10:
 				exit = true;
 				break;
 			default:
-				System.out.println("Invalid choice. Please enter a number between 1 and 8.");
+				System.out.println("Invalid option selected.");
+				break;
+
 			}
+
 		}
 		scanner.close();
 	}

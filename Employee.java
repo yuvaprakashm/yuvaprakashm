@@ -29,5 +29,9 @@ public class Employee {
 	public String getDepartment() {
 		return department;
 	}
+	@Override
+    public String toString() {
+        return "Employee ID: " + empID + ", Name: " + firstName + " " + lastName + ", Department: " + department;
+    }
 
 }
